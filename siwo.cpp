@@ -7,8 +7,9 @@
 
 #include "siwo.h"
 #include <iostream>
+#include <experimental/algorithm>
 
-SIWOplus::SIWOplus(Graph* graph) : m_graph{graph}, m_rng{ 1 }, m_currentCommunityId{ 0 } {
+SIWOplus::SIWOplus(Graph* graph, char mean) : m_graph{graph}, m_rng{ 1 }, m_currentCommunityId{ 0 }, m_mean{ mean } {
     m_currentCommunity = new std::unordered_set<Node*>();
     m_unclusteredNodes = new std::unordered_set<Node*>();
     for (auto& pair : *m_graph->getNodes()) {
@@ -30,7 +31,7 @@ SIWOplus::~SIWOplus() {
 Node* SIWOplus::selectStartNode() {
     // randomly select a starting node from the unclustered nodes
     Node* sampleIt[1]{};
-    std::sample(m_unclusteredNodes->begin(), m_unclusteredNodes->end(), sampleIt, 1, m_rng);
+    std::experimental::sample(m_unclusteredNodes->begin(), m_unclusteredNodes->end(), sampleIt, 1, m_rng);
     return sampleIt[0];
 }
 
@@ -55,7 +56,12 @@ void SIWOplus::calculateSupport(Node *node1, Node *node2) {
             // get both edges to the common neighbour and average three edges for support
             double w2 = node_edge.second->weight;
             double w3 = edgeData->second->weight;
-            double support = std::pow( w1*w2*w3, 1.0 / 3.0);
+            double support{ 0 };
+            if (m_mean == 'a') {
+                support = (w1 + w2 + w3) / 3.0;
+            } else {
+                support = std::pow( w1*w2*w3, 1.0 / 3.0);
+            }
             totalSupport += support;
         }
     }

@@ -24,9 +24,10 @@ public:
     std::unordered_map<Node*, double>* m_shell; // track nodes in the shell set with their strength contributions
     std::vector<std::unordered_set<Node*>*>* m_communities;
     std::mt19937 m_rng;
+    char m_mean;
     
 public:
-    SIWOplus(Graph* graph);
+    SIWOplus(Graph* graph, char mean);
     
     ~SIWOplus();
     
